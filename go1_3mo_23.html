@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>꼼꼼 영어듣기</title>
+    <style>
+      body {
+    font-size: 13px;
+}
+      
+     .sentence-display p {
+       font-size: 12px;
+       margin: 4px; 
+}       
+      #examButton, #closeExamButton, #checkAnswersButton {
+    padding: 2px 0px;
+    display: inline-block; 
+    margin: 5px; 
+    background-color: #DA70D6;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 120px;
+    height: 30px;
+    font-size: 15px;
+    font-weight: bold;
+    position: relative;
+    white-space: nowrap;
+    vertical-align: middle; 
+    margin-left: 200px;        
+    line-height: 30px; /* 버튼의 높이와 동일한 높이로 설정 */
+}
+      
+      #confirmButton {
+            padding: 0px 0px;
+            font-size: 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 3px;
+            margin-top: 30px;
+            background-color: #3498db;
+            color: #fff;
+        width: 50px;
+    height: 50px;
+        white-space: nowrap;
+         line-height: 50px; /* 버튼의 높이와 동일한 높이로 설정 */        
+    }
+      
+      
+      #audioPlayer {
+            width: 100%; 
+        }
+      
+      
+       button {
+            padding: 3px 7px;
+            font-size: 13px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 3px;
+            margin-top: 5px;
+            background-color: #3498db;
+            color: #fff;
+        white-space: nowrap;
+         line-height: 18px; /* 버튼의 높이와 동일한 높이로 설정 */
+    }
+      
+      
+      
+       .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); 
+        z-index: 999; 
+        display: none; 
+    }
+    
+      
+    .popup-box {
+    width: 250px;
+    height: auto;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    text-align: center; 
+}
+
+    .background-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); 
+        z-index: 998; 
+    }
+
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <button id="examButton">시험 치러 가기</button>
+    <button id="closeExamButton" style="display: none;">꼼꼼 보러 가기</button>
+    <audio id="audioPlayer" controls>
+        <source id="audioSource" type="audio/mpeg">
+    </audio>
+    <script>
+      
+      /* 드래그 이벤트를 막는 스타일 */   
+let touchStartY;
+document.body.addEventListener('touchstart', function(event) {
+    touchStartY = event.touches[0].clientY;
+});
+
+document.body.addEventListener('touchmove', function(event) {
+    if (touchStartY < event.touches[0].clientY && window.scrollY === 0) {
+        event.preventDefault();
+    }
+});
+
+      /* 요기까지 */
+      
+        document.getElementById('audioPlayer').style.display = 'none';
+        const audioURL = "audio/go1_3mo_23.mp3";
+        document.getElementById('audioSource').src = audioURL;
+        const quizzes = [
+            {
+                question:
+            "<p>1. 다음을 듣고, 남자가 하는 말의 목적으로 가장 적절한 것을 고르시오.</p>",
+          choices: ["① 아이스하키부의 우승을 알리려고", "② 아이스하키부 훈련 일정을 공지하려고", "③ 아이스하키부 신임 감독을 소개하려고", "④ 아이스하키부 선수 모집을 안내하려고", "⑤ 아이스하키부 경기의 관람을 독려하려고"],
+          correctAnswer: 5,
+          audioURL: audioURL,
+          playbackStart: "3:15",
+          playbackEnd: "4:16",
+                audiotext: [
+                    { text: "	Hello, Villeford High School students. 	", audioSrc: "	audio/go1_3mo_23/1-1.mp3	" }, { text: "	안녕하세요, 빌포드 고등학교 학생들입니다.	" },
+{ text: "	This is principal  Aaron  Clark.  	", audioSrc: "	audio/go1_3mo_23/1-2.mp3	" }, { text: "	이분은 애런 클라크 교장입니다.	" },
+{ text: "	As  a big  fan  of  the Villeford  ice  hockey  team,  	", audioSrc: "	audio/go1_3mo_23/1-3.mp3	" }, { text: "	빌포드 아이스하키팀의 열렬한 팬으로서,	" },
+{ text: "	I’m  very  excited about  the  upcoming  National  High  School  Ice Hockey  League. 	", audioSrc: "	audio/go1_3mo_23/1-4.mp3	" }, { text: "	곧 있을 전국 고등학교 아이스하키 리그가 매우 기대됩니다.	" },
+{ text: "	As  you  all  know,  	", audioSrc: "	audio/go1_3mo_23/1-5.mp3	" }, { text: "	다들 아시다시피,	" },
+{ text: "	the  first game  will  be  held  in  the  Central  Rink  at  6p.m. this Saturday. 	", audioSrc: "	audio/go1_3mo_23/1-6.mp3	" }, { text: "	첫번째 경기는 이번주 토요일 오후 6시에 센트럴링크에서 열릴 예정입니다.	" },
+{ text: "	I want as many of you as possible  to  come  and  cheer  our  team  to victory.  	", audioSrc: "	audio/go1_3mo_23/1-7.mp3	" }, { text: "	가능한 한 많은 분들이 오셔서 저희 팀이 승리할 수 있도록 응원해 주셨으면 합니다.	" },
+{ text: "	I’ve  seen  them  put  in  an  incredible amount of effort to win the league. 	", audioSrc: "	audio/go1_3mo_23/1-8.mp3	" }, { text: "	저는 그들이 리그 우승을 위해 엄청난 노력을 기울이는 것을 보았습니다.	" },
+{ text: "	It will help them  play  better  just  to  see  you  there cheering for them. 	", audioSrc: "	audio/go1_3mo_23/1-9.mp3	" }, { text: "	그들을 응원하는 당신을 보는 것만으로도 그들이 더 잘 놀 수 있도록 도와줄 것입니다.	" },
+{ text: "	I really hope to see you at the rink. 	", audioSrc: "	audio/go1_3mo_23/1-10.mp3	" }, { text: "	링크에서 뵙기를 정말 바랍니다.	" },
+{ text: "	Thank you.	", audioSrc: "	audio/go1_3mo_23/1-11.mp3	" }, { text: "	감사해요.	" },
+
+
+                ],
+                sentenceButtonState: 0
+            },
+            {
+                question: "<p>2. 대화를 듣고, 여자의 의견으로 가장 적절한 것을 고르시오.</p>",
+          choices: ["① 과다한 항생제 복용을 자제해야 한다.", "② 오래된 약을 함부로 폐기해서는 안 된다.", "③ 약을 복용할 때는 정해진 시간을 지켜야 한다.", "④ 진료 전에 자신의 증상을 정확히 확인해야 한다.", "⑤ 다른 사람에게 처방된 약을 복용해서는 안 된다."],
+          correctAnswer: 5,
+          audioURL: audioURL,
+          playbackStart: "4:26",
+          playbackEnd: "5:26",
+                audiotext: [
+                    { text: "	W: Honey, are you okay?	", audioSrc: "	audio/go1_3mo_23/2-1.mp3	" }, { text: "	W: 여보, 괜찮아요?	" },
+{ text: "	M: I’m afraid I’ve caught a cold. 	", audioSrc: "	audio/go1_3mo_23/2-2.mp3	" }, { text: "	M: 제가 감기에 걸린 것 같습니다.	" },
+{ text: "	I’ve got a sore throat.	", audioSrc: "	audio/go1_3mo_23/2-3.mp3	" }, { text: "	목이 아파요.	" },
+{ text: "	W: Why don’t you go see a doctor?	", audioSrc: "	audio/go1_3mo_23/2-4.mp3	" }, { text: "	W: 병원에 가보는 게 어때요?	" },
+{ text: "	M: Well, I don’t think it’s necessary. 	", audioSrc: "	audio/go1_3mo_23/2-5.mp3	" }, { text: "	M: 글쎄요, 그럴 필요는 없다고 생각합니다.	" },
+{ text: "	I’ve found some medicine in the cabinet. 	", audioSrc: "	audio/go1_3mo_23/2-6.mp3	" }, { text: "	캐비닛에서 약을 찾았어요.	" },
+{ text: "	I’ll take it.	", audioSrc: "	audio/go1_3mo_23/2-7.mp3	" }, { text: "	제가 받을게요.	" },
+{ text: "	W: You shouldn’t take that medicine. 	", audioSrc: "	audio/go1_3mo_23/2-8.mp3	" }, { text: "	W: 그 약은 먹으면 안 됩니다.	" },
+{ text: "	That’s what I got prescribed last week.	", audioSrc: "	audio/go1_3mo_23/2-9.mp3	" }, { text: "	지난주에 처방받은 거예요.	" },
+{ text: "	M: My symptoms are similar to yours.	", audioSrc: "	audio/go1_3mo_23/2-10.mp3	" }, { text: "	M: 제 증상은 당신과 비슷합니다.	" },
+{ text: "	W: Honey, 	", audioSrc: "	audio/go1_3mo_23/2-11.mp3	" }, { text: "	W: 여보,	" },
+{ text: "	you shouldn’t take medicine prescribed for others.	", audioSrc: "	audio/go1_3mo_23/2-12.mp3	" }, { text: "	다른 사람에게 처방된 약을 먹으면 안 됩니다.	" },
+{ text: "	M: It’s just a cold. I’ll get better if I take your medicine.	", audioSrc: "	audio/go1_3mo_23/2-13.mp3	" }, { text: "	M: 그냥 감기네요. 약을 먹으면 나을 거예요.	" },
+{ text: "	W: It could be dangerous to take someone else’s prescription.	", audioSrc: "	audio/go1_3mo_23/2-14.mp3	" }, { text: "	W: 다른 사람의 처방전을 받아 가는 것은 위험할 수 있습니다.	" },
+{ text: "	M: Okay. 	", audioSrc: "	audio/go1_3mo_23/2-15.mp3	" }, { text: "	M: 네.	" },
+{ text: "	Then I’ll go see a doctor this afternoon.	", audioSrc: "	audio/go1_3mo_23/2-16.mp3	" }, { text: "	그럼 오늘 오후에 병원에 가보겠습니다.	" },
+
+                  
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                 question: "<p>3. 대화를 듣고, 두 사람의 관계를 가장 잘 나타낸 것을 고르시오.</p>",
+          choices: ["① 관람객 - 박물관 관장", "② 세입자 - 건물 관리인", "③ 화가 - 미술관 직원", "④ 고객 - 전기 기사", "⑤ 의뢰인 - 건축사"],
+          correctAnswer: 3,
+          audioURL: audioURL,
+          playbackStart: "5:36",
+          playbackEnd: "6:32",
+                audiotext: [
+                    { text: "	W: Hi, Mr. Thomson. 	", audioSrc: "	audio/go1_3mo_23/3-1.mp3	" }, { text: "	W: 안녕하세요, 톰슨 씨.	" },
+{ text: "	How are your preparations going?	", audioSrc: "	audio/go1_3mo_23/3-2.mp3	" }, { text: "	준비는 잘 되고 있습니까?	" },
+{ text: "	M: You arrived at the right time. 	", audioSrc: "	audio/go1_3mo_23/3-3.mp3	" }, { text: "	M: 정확한 시간에 도착하셨네요.	" },
+{ text: "	I have something to tell you.	", audioSrc: "	audio/go1_3mo_23/3-4.mp3	" }, { text: "	당신에게 할 얘기가 있어요.	" },
+{ text: "	W: Okay. What is it?	", audioSrc: "	audio/go1_3mo_23/3-5.mp3	" }, { text: "	W: 네. 어떤 거죠?	" },
+{ text: "	M: Well, I’m afraid that we have to change the exhibition room for your paintings.	", audioSrc: "	audio/go1_3mo_23/3-6.mp3	" }, { text: "	M: 죄송하지만 귀하의 그림을 위해 전시실을 변경해야 합니다.	" },
+{ text: "	W: May I ask why?	", audioSrc: "	audio/go1_3mo_23/3-7.mp3	" }, { text: "	W: 왜 그러시는지 여쭤봐도 될까요?	" },
+{ text: "	M: Sure. 	", audioSrc: "	audio/go1_3mo_23/3-8.mp3	" }, { text: "	M: 네.	" },
+{ text: "	We have some electrical problems there.	", audioSrc: "	audio/go1_3mo_23/3-9.mp3	" }, { text: "	전기적인 문제가 있습니다.	" },
+{ text: "	W: I see. 	", audioSrc: "	audio/go1_3mo_23/3-10.mp3	" }, { text: "	W: 그렇군요.	" },
+{ text: "	Then where are you going to exhibit my works?	", audioSrc: "	audio/go1_3mo_23/3-11.mp3	" }, { text: "	그럼 제 작품을 어디서 전시하실 건가요?	" },
+{ text: "	M: Our gallery is going to exhibit your paintings in the main hall.	", audioSrc: "	audio/go1_3mo_23/3-12.mp3	" }, { text: "	M: 저희 갤러리는 메인 홀에서 귀하의 그림을 전시할 예정입니다.	" },
+{ text: "	W: Okay. Can I see the hall now?	", audioSrc: "	audio/go1_3mo_23/3-13.mp3	" }, { text: "	W: 알겠습니다. 지금 홀을 볼 수 있을까요?	" },
+{ text: "	M: Sure. Come with me.	", audioSrc: "	audio/go1_3mo_23/3-14.mp3	" }, { text: "	M: 그럼요. 저랑 같이 가요.	" },
+{ text: "		", audioSrc: "	audio/go1_3mo_23/3-15.mp3	" }, { text: "		" },
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                question: "<p>4. 대화를 듣고, 그림에서 대화의 내용과 일치하지 않는 것을 고르시오.</p><img src='image/go1_03_23_04.png' style='max-width: 100%; height: auto;'>",
+          choices: ["① 번", "② 번", "③ 번", "④ 번", "⑤ 번"],
+          correctAnswer: 5,
+          audioURL: audioURL,
+                audiotext: [
+                    { text: "	M: Hi, Grace. 	", audioSrc: "	audio/go1_3mo_23/4-1.mp3	" }, { text: "	M: 안녕, 그레이스.	" },
+{ text: "	What are you looking at on your phone?	", audioSrc: "	audio/go1_3mo_23/4-2.mp3	" }, { text: "	핸드폰으로 뭘 보고 계세요?	" },
+{ text: "	W: Hi, James. 	", audioSrc: "	audio/go1_3mo_23/4-3.mp3	" }, { text: "	W: 안녕, 제임스.	" },
+{ text: "	It’s a photo I took when I did some volunteer work. 	", audioSrc: "	audio/go1_3mo_23/4-4.mp3	" }, { text: "	제가 봉사활동을 할 때 찍은 사진입니다.	" },
+{ text: "	We painted pictures on a street wall.	", audioSrc: "	audio/go1_3mo_23/4-5.mp3	" }, { text: "	우리는 거리 벽에 그림을 그렸습니다.	" },
+{ text: "	M: Let me see. Wow, 	", audioSrc: "	audio/go1_3mo_23/4-6.mp3	" }, { text: "	M: 어디 보자, 우와,	" },
+{ text: "	I like the whale with the flower pattern.	", audioSrc: "	audio/go1_3mo_23/4-7.mp3	" }, { text: "	저는 꽃무늬가 있는 고래를 좋아합니다.	" },
+{ text: "	W: I like it, too. 	", audioSrc: "	audio/go1_3mo_23/4-8.mp3	" }, { text: "	W: 저도 마음에 들어요.	" },
+{ text: "	How do you like the house under the whale?	", audioSrc: "	audio/go1_3mo_23/4-9.mp3	" }, { text: "	고래 밑에 있는 집은 어떻습니까?	" },
+{ text: "	M: It’s beautiful.	", audioSrc: "	audio/go1_3mo_23/4-10.mp3	" }, { text: "	M: 정말 아름답습니다.	" },
+{ text: "	 What are these two chairs for?	", audioSrc: "	audio/go1_3mo_23/4-11.mp3	" }, { text: "	이 두 개의 의자는 무엇을 위한 것입니까?	" },
+{ text: "	W: You can take a picture sitting there. 	", audioSrc: "	audio/go1_3mo_23/4-12.mp3	" }, { text: "	W: 저기 앉아서 사진을 찍으시면 됩니다.	" },
+{ text: "	The painting becomes the background.	", audioSrc: "	audio/go1_3mo_23/4-13.mp3	" }, { text: "	그림이 배경이 됩니다.	" },
+{ text: "	M: Oh, I see. 	", audioSrc: "	audio/go1_3mo_23/4-14.mp3	" }, { text: "	M: 아, 그렇군요.	" },
+{ text: "	Look at this tree! It has heart­shaped leaves.	", audioSrc: "	audio/go1_3mo_23/4-15.mp3	" }, { text: "	이 나무를 보세요! 그것은 하트 ­ 모양의 잎을 가지고 있습니다.	" },
+{ text: "	W: That’s right. 	", audioSrc: "	audio/go1_3mo_23/4-16.mp3	" }, { text: "	W: 그렇습니다.	" },
+{ text: "	We named it the Love Tree.	", audioSrc: "	audio/go1_3mo_23/4-17.mp3	" }, { text: "	우리는 그것을 사랑의 나무라고 이름 지었습니다.	" },
+{ text: "	M: The butterfly on the tree branch is lovely, too.	", audioSrc: "	audio/go1_3mo_23/4-18.mp3	" }, { text: "	M: 나뭇가지 위에 있는 나비도 너무 예뻐요.	" },
+{ text: "	W: I hope a lot of people enjoy the painting.	", audioSrc: "	audio/go1_3mo_23/4-19.mp3	" }, { text: "	W: 많은 분들이 이 그림을 재미있게 감상하셨으면 좋겠습니다.	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                question: "<p>5. 대화를 듣고, 남자가 할 일로 가장 적절한 것을 고르시오.</p>",
+          choices: ["① 티켓 디자인하기 ", "② 포스터 게시하기", "③ 블로그 개설하기", "④ 밴드부원 모집하기", "⑤ 콘서트 장소 대여하기"],
+          correctAnswer: 2,
+          audioURL: audioURL,
+          playbackStart: "8:03",
+          playbackEnd: "9:15",
+                audiotext: [
+                    { text: "	M: Hi, Stella. 	", audioSrc: "	audio/go1_3mo_23/5-1.mp3	" }, { text: "	M: 안녕, 스텔라.	" },
+{ text: "	How are you doing these days?	", audioSrc: "	audio/go1_3mo_23/5-2.mp3	" }, { text: "	요즘 어떻게 지내세요?	" },
+{ text: "	W: Hi, Ryan. 	", audioSrc: "	audio/go1_3mo_23/5-3.mp3	" }, { text: "	W: 안녕, 라이언.	" },
+{ text: "	I’ve been busy helping my granddad with his concert. 	", audioSrc: "	audio/go1_3mo_23/5-4.mp3	" }, { text: "	저는 할아버지의 콘서트를 돕느라 바빴어요.	" },
+{ text: "	He made a rock band with his friends.	", audioSrc: "	audio/go1_3mo_23/5-5.mp3	" }, { text: "	그는 친구들과 락밴드를 만들었습니다.	" },
+{ text: "	M: There must be a lot of things to do.	", audioSrc: "	audio/go1_3mo_23/5-6.mp3	" }, { text: "	M: 할 일이 많을 겁니다.	" },
+{ text: "	W: Yeah. I reserved a place for the concert yesterday.	", audioSrc: "	audio/go1_3mo_23/5-7.mp3	" }, { text: "	W: 네. 어제 콘서트 장소를 예약했어요.	" },
+{ text: "	M: What about posters and tickets?	", audioSrc: "	audio/go1_3mo_23/5-8.mp3	" }, { text: "	M: 포스터와 티켓은 어떻습니까?	" },
+{ text: "	W: Well, I’ve just finished designing a poster.	", audioSrc: "	audio/go1_3mo_23/5-9.mp3	" }, { text: "	W: 글쎄요, 저는 포스터 디자인을 막 마쳤습니다.	" },
+{ text: "	M: Then I think I can help you.	", audioSrc: "	audio/go1_3mo_23/5-10.mp3	" }, { text: "	M: 그럼 제가 도와드릴 수 있을 것 같습니다.	" },
+{ text: "	W: Really? How?	", audioSrc: "	audio/go1_3mo_23/5-11.mp3	" }, { text: "	W: 정말요? 어떻게요?	" },
+{ text: "	M: Actually,	", audioSrc: "	audio/go1_3mo_23/5-12.mp3	" }, { text: "	M: 사실은,	" },
+{ text: "	 I have a music blog. I think I can upload the poster there.	", audioSrc: "	audio/go1_3mo_23/5-13.mp3	" }, { text: "	저는 음악 블로그가 있는데 거기에 포스터를 올릴 수 있을 것 같아요.	" },
+{ text: "	W: That’s great!	", audioSrc: "	audio/go1_3mo_23/5-14.mp3	" }, { text: "	W: 잘됐네요!	" },
+{ text: "	M: Just send the poster to me, and I’ll post it online.	", audioSrc: "	audio/go1_3mo_23/5-15.mp3	" }, { text: "	M: 포스터를 저에게 보내주시면 제가 온라인에 올릴게요.	" },
+{ text: "	W: Thanks a lot.	", audioSrc: "	audio/go1_3mo_23/5-16.mp3	" }, { text: "	W: 감사합니다.	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                question: "<p>6. 대화를 듣고, 여자가 지불할 금액을 고르시오. [3점]</p>",
+          choices: ["① $70 ", "② $90", "③ $100", "④ $110", "⑤ $120"],
+          correctAnswer: 2,
+          audioURL: audioURL,
+          playbackStart: "9:18",
+          playbackEnd: "10:33",
+                audiotext: [
+                    { text: "	M: Good morning. 	", audioSrc: "	audio/go1_3mo_23/6-1.mp3	" }, { text: "	M: 좋은 아침입니다.	" },
+{ text: "	How may I help you?	", audioSrc: "	audio/go1_3mo_23/6-2.mp3	" }, { text: "	무엇을 도와드릴까요?	" },
+{ text: "	W: Hi. I want to buy a coffee pot.	", audioSrc: "	audio/go1_3mo_23/6-3.mp3	" }, { text: "	W: 안녕하세요. 커피포트를 사고 싶습니다.	" },
+{ text: "	M: Okay. You can choose from these coffee pots.	", audioSrc: "	audio/go1_3mo_23/6-4.mp3	" }, { text: "	M: 네. 이 커피포트 중에서 고르시면 됩니다.	" },
+{ text: "	W: I like this one. How much is it?	", audioSrc: "	audio/go1_3mo_23/6-5.mp3	" }, { text: "	W: 저는 이 제품이 마음에 듭니다. 가격은 얼마인가요?	" },
+{ text: "	M: It was originally $60, but it’s now on sale for $50.	", audioSrc: "	audio/go1_3mo_23/6-6.mp3	" }, { text: "	M: 원래는 60달러였는데 지금은 50달러에 판매하고 있습니다.	" },
+{ text: "	W: Okay, I’ll buy it. I’d also like to buy this red tumbler.	", audioSrc: "	audio/go1_3mo_23/6-7.mp3	" }, { text: "	W: 네, 구매할게요. 이 빨간 텀블러도 사고 싶어요.	" },
+{ text: "	M: Actually, it comes in two sizes. 	", audioSrc: "	audio/go1_3mo_23/6-8.mp3	" }, { text: "	M: 사실 두 가지 사이즈가 있습니다.	" },
+{ text: "	This smaller one is $20 and a bigger one is $30.	", audioSrc: "	audio/go1_3mo_23/6-9.mp3	" }, { text: "	이 작은 것은 20달러이고 큰 것은 30달러입니다.	" },
+{ text: "	W: The smaller one would be easier to carry around. 	", audioSrc: "	audio/go1_3mo_23/6-10.mp3	" }, { text: "	W: 작은 것이 휴대하기에 더 편할 것 같습니다.	" },
+{ text: "	I’ll buy two smaller ones.	", audioSrc: "	audio/go1_3mo_23/6-11.mp3	" }, { text: "	더 작은 것을 두 개 사겠습니다.	" },
+{ text: "	M: All right. 	", audioSrc: "	audio/go1_3mo_23/6-12.mp3	" }, { text: "	M: 알겠습니다.	" },
+{ text: "	Is there anything else you need?	", audioSrc: "	audio/go1_3mo_23/6-13.mp3	" }, { text: "	그 밖에 더 필요한 건 없으시나요?	" },
+{ text: "	W: No, that’s all. Thank you.	", audioSrc: "	audio/go1_3mo_23/6-14.mp3	" }, { text: "	W: 아니요, 그게 전부입니다. 감사합니다.	" },
+{ text: "	M: Okay. 	", audioSrc: "	audio/go1_3mo_23/6-15.mp3	" }, { text: "	M: 네.	" },
+{ text: "	How would you like to pay?	", audioSrc: "	audio/go1_3mo_23/6-16.mp3	" }, { text: "	결제는 어떻게 하시겠어요?	" },
+{ text: "	W: I’ll pay by credit card. 	", audioSrc: "	audio/go1_3mo_23/6-17.mp3	" }, { text: "	W: 신용카드로 결제하겠습니다.	" },
+{ text: "	Here you are.	", audioSrc: "	audio/go1_3mo_23/6-18.mp3	" }, { text: "	여기 있어요.	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                question: "<p>7. 대화를 듣고, 남자가 지갑을 구매하지 못한 이유를 고르시오. [3점]</p>",
+          choices: ["① 해당 상품이 다 팔려서 ", "② 브랜드명을 잊어버려서", "③ 계산대의 줄이 길어서", "④ 공항에 늦게 도착해서", "⑤ 면세점이 문을 닫아서"],
+          correctAnswer: 1,
+          audioURL: audioURL,
+          playbackStart: "10:43",
+          playbackEnd: "11:50",
+                audiotext: [
+                    { text: "	W: Hi, Brian.	", audioSrc: "	audio/go1_3mo_23/7-1.mp3	" }, { text: "	W: 안녕, 브라이언.	" },
+{ text: "	M: Hi, Mom. I’m in line to get on the plane.	", audioSrc: "	audio/go1_3mo_23/7-2.mp3	" }, { text: "	M: 안녕하세요, 엄마. 비행기 타려고 줄 서 있어요.	" },
+{ text: "	W: Okay. By the way, 	", audioSrc: "	audio/go1_3mo_23/7-3.mp3	" }, { text: "	W: 네. 그런데요,	" },
+{ text: "	did you drop by the duty free shop in the airport?	", audioSrc: "	audio/go1_3mo_23/7-4.mp3	" }, { text: "	공항에 있는 면세점에 들렀습니까?	" },
+{ text: "	M: Yes, but I couldn’t buy the wallet you asked me to buy.	", audioSrc: "	audio/go1_3mo_23/7-5.mp3	" }, { text: "	M: 네, 그런데 사달라고 하신 지갑을 못 샀어요.	" },
+{ text: "	W: Did you forget the brand name?	", audioSrc: "	audio/go1_3mo_23/7-6.mp3	" }, { text: "	W: 브랜드명을 잊어버리셨나요?	" },
+{ text: "	M: No. I remembered that. 	", audioSrc: "	audio/go1_3mo_23/7-7.mp3	" }, { text: "	M: 아니요. 기억하고 있었어요.	" },
+{ text: "	I took a memo.	", audioSrc: "	audio/go1_3mo_23/7-8.mp3	" }, { text: "	메모를 했습니다.	" },
+{ text: "	W: Then did you arrive late at the airport?	", audioSrc: "	audio/go1_3mo_23/7-9.mp3	" }, { text: "	W: 그럼 공항에 늦게 도착하셨나요?	" },
+{ text: "	M: No, I had enough time to shop.	", audioSrc: "	audio/go1_3mo_23/7-10.mp3	" }, { text: "	M: 아니요, 쇼핑할 시간이 충분했어요.	" },
+{ text: "	W: Then why couldn’t you buy the wallet?	", audioSrc: "	audio/go1_3mo_23/7-11.mp3	" }, { text: "	W: 그럼 왜 지갑을 못 사셨나요?	" },
+{ text: "	M: Actually, because they were all sold out.	", audioSrc: "	audio/go1_3mo_23/7-12.mp3	" }, { text: "	M: 사실 다 팔려서요.	" },
+{ text: "	W: Oh, really?	", audioSrc: "	audio/go1_3mo_23/7-13.mp3	" }, { text: "	W: 아, 그래요?	" },
+{ text: "	M: Yeah. The wallet must be very popular.	", audioSrc: "	audio/go1_3mo_23/7-14.mp3	" }, { text: "	M: 네. 지갑이 인기가 많겠네요.	" },
+{ text: "	W: Okay. Thanks for checking anyway.	", audioSrc: "	audio/go1_3mo_23/7-15.mp3	" }, { text: "	W: 알겠습니다. 어쨌든 확인해 주셔서 감사합니다.	" },
+
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                question: "<p>8. 대화를 듣고, Youth Choir Audition에 관해 언급되지 않은 것을 고르시오. [3점]</p>",
+          choices: ["① 지원 가능 연령", "② 날짜", "③ 심사 기준", "④ 참가비", "⑤ 지원 방법"],
+          correctAnswer: 3,
+          audioURL: audioURL,
+          playbackStart: "11:59.5",
+          playbackEnd: "13:06",
+                audiotext: [
+                    { text: "	M: Lucy, look at this.	", audioSrc: "	audio/go1_3mo_23/8-1.mp3	" }, { text: "	M: 루시, 이것 좀 봐요.	" },
+{ text: "	W: Wow. It’s about the Youth Choir Audition.	", audioSrc: "	audio/go1_3mo_23/8-2.mp3	" }, { text: "	W: 우와. 청소년 합창 오디션에 관한 것입니다.	" },
+{ text: "	M: Yes. It’s open to anyone aged 13 to 18.	", audioSrc: "	audio/go1_3mo_23/8-3.mp3	" }, { text: "	M: 네. 13세부터 18세까지 누구나 이용할 수 있습니다.	" },
+{ text: "	W: I’m interested in joining the choir. 	", audioSrc: "	audio/go1_3mo_23/8-4.mp3	" }, { text: "	W: 저는 합창단에 참여하는 것에 관심이 있습니다.	" },
+{ text: "	When is it?	", audioSrc: "	audio/go1_3mo_23/8-5.mp3	" }, { text: "	그게 언젠데요?	" },
+{ text: "	M: April 2nd, from 9 a.m. to 5 p.m.	", audioSrc: "	audio/go1_3mo_23/8-6.mp3	" }, { text: "	M: April 2nd, from 9 a.m. to 5 p.m.	" },
+{ text: "	W: The place for the audition is the Youth Training Center. 	", audioSrc: "	audio/go1_3mo_23/8-7.mp3	" }, { text: "	W: 오디션 장소는 청소년 수련원입니다.	" },
+{ text: "	It’s really far from here.	", audioSrc: "	audio/go1_3mo_23/8-8.mp3	" }, { text: "	여기서 진짜 멀어요.	" },
+{ text: "	M: I think you should leave early in the morning.	", audioSrc: "	audio/go1_3mo_23/8-9.mp3	" }, { text: "	M: 아침 일찍 출발하시는 게 좋을 것 같아요.	" },
+{ text: "	W: That’s no problem. Is there an entry fee?	", audioSrc: "	audio/go1_3mo_23/8-10.mp3	" }, { text: "	W: 괜찮습니다. 입장료가 있나요?	" },
+{ text: "	M: No, it’s free.	", audioSrc: "	audio/go1_3mo_23/8-11.mp3	" }, { text: "	M: 아니요, 무료입니다.	" },
+{ text: "	W: Good. I’ll apply for the audition.	", audioSrc: "	audio/go1_3mo_23/8-12.mp3	" }, { text: "	W: 좋습니다. 오디션에 지원하겠습니다.	" },
+{ text: "	M: Then you should fill out an application form on this website.	", audioSrc: "	audio/go1_3mo_23/8-13.mp3	" }, { text: "	M: 그렇다면 이 웹사이트에서 신청서를 작성하셔야 합니다.	" },
+{ text: "	W: All right. Thanks.	", audioSrc: "	audio/go1_3mo_23/8-14.mp3	" }, { text: "	W: 알겠습니다. 감사합니다.	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                question: "<p>9. 2023 Career Week에 관한 다음 내용을 듣고, 일치하지 않는 것을 고르시오.</p>",
+          choices: ["① 5일 동안 열릴 것이다.", "② 미래 직업 탐색을 돕는 프로그램이 있을 것이다.", "③ 프로그램 참가 인원에 제한이 있다.", "④ 특별 강연이 마지막 날에 있을 것이다.", "⑤ 등록은 5월 10일에 시작된다."],
+          correctAnswer: 4,
+          audioURL: audioURL,
+          playbackStart: "13:16",
+          playbackEnd: "14:25",
+                audiotext: [
+                    { text: "	Hello, Rosehill High School students!	", audioSrc: "	audio/go1_3mo_23/9-1.mp3	" }, { text: "	로즈힐 고등학교 학생 여러분 안녕하세요!	" },
+{ text: "	I’m your school counselor, Ms.	", audioSrc: "	audio/go1_3mo_23/9-2.mp3	" }, { text: "	저는 선생님의 학교 상담원입니다, 선생님.	" },
+{ text: "	Lee. I’m so happy to announce a special event, the 2023 Career Week. 	", audioSrc: "	audio/go1_3mo_23/9-3.mp3	" }, { text: "	이. 2023 커리어 위크라는 특별한 행사를 발표하게 되어 너무 기쁩니다.	" },
+{ text: "	It’ll be held from May 22nd for five days.	", audioSrc: "	audio/go1_3mo_23/9-4.mp3	" }, { text: "	5월 22일부터 5일간 진행됩니다.	" },
+{ text: "	There will be many programs to help you explore various future jobs. 	", audioSrc: "	audio/go1_3mo_23/9-5.mp3	" }, { text: "	다양한 미래 직업을 탐색하는 데 도움이 되는 프로그램이 많이 있을 것입니다.	" },
+{ text: "	Please	", audioSrc: "	audio/go1_3mo_23/9-6.mp3	" }, { text: "	부탁해요.	" },
+{ text: "	kindly note that the number of participants for each program is	", audioSrc: "	audio/go1_3mo_23/9-7.mp3	" }, { text: "	각 프로그램의 참가자 수는 다음과 같습니다	" },
+{ text: "	limited to 20. 	", audioSrc: "	audio/go1_3mo_23/9-8.mp3	" }, { text: "	20개 한정.	" },
+{ text: "	A special lecture on future career choices will be	", audioSrc: "	audio/go1_3mo_23/9-9.mp3	" }, { text: "	미래의 직업 선택에 대한 특강이 있을 예정입니다	" },
+{ text: "	presented on the first day. 	", audioSrc: "	audio/go1_3mo_23/9-10.mp3	" }, { text: "	첫날에 발표했습니다.	" },
+{ text: "	Registration begins on May 10th. 	", audioSrc: "	audio/go1_3mo_23/9-11.mp3	" }, { text: "	등록은 5월 10일부터 시작됩니다.	" },
+{ text: "	For more information, 	", audioSrc: "	audio/go1_3mo_23/9-12.mp3	" }, { text: "	자세한 정보는,	" },
+{ text: "	please visit our school website. 	", audioSrc: "	audio/go1_3mo_23/9-13.mp3	" }, { text: "	저희 학교 홈페이지를 방문해 주시기 바랍니다.	" },
+{ text: "	I hope you can come and enjoy the 2023 Career Week!	", audioSrc: "	audio/go1_3mo_23/9-14.mp3	" }, { text: "	2023년 커리어 위크를 즐기실 수 있기를 바랍니다!	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                question: "<p>10. 다음 표를 보면서 대화를 듣고, 여자가 구입할 프라이팬을 고르시오.</p><img src='image/go1_03_23_10.png' style='max-width: 100%; height: auto;'>",
+          choices: ["① 번", "② 번", "③ 번", "④ 번", "⑤ 번"],
+          correctAnswer: 2   ,
+          audioURL: audioURL,
+          playbackStart: "14:35.5",
+          playbackEnd: "15:49",
+                audiotext: [
+                    { text: "	M: Jessica, what are you doing?	", audioSrc: "	audio/go1_3mo_23/10-1.mp3	" }, { text: "	M: 제시카, 뭐하는 거예요?	" },
+{ text: "	W: I’m trying to buy one of these five frying pans.	", audioSrc: "	audio/go1_3mo_23/10-2.mp3	" }, { text: "	W: 이 프라이팬 다섯 개 중 하나를 사려고 합니다.	" },
+{ text: "	M: Let me see. 	", audioSrc: "	audio/go1_3mo_23/10-3.mp3	" }, { text: "	M: 어디 볼게요.	" },
+{ text: "	This frying pan seems pretty expensive.	", audioSrc: "	audio/go1_3mo_23/10-4.mp3	" }, { text: "	이 프라이팬은 꽤 비싼 것 같습니다.	" },
+{ text: "	W: Yeah. I don’t want to spend more than $50.	", audioSrc: "	audio/go1_3mo_23/10-5.mp3	" }, { text: "	W: 네. 50달러 이상은 쓰고 싶지 않아요.	" },
+{ text: "	M: Okay. And I think 9 to 12­inch frying pans will work for most of your cooking.	", audioSrc: "	audio/go1_3mo_23/10-6.mp3	" }, { text: "	M: 알겠습니다. 그리고 요리는 대부분 ­인치 프라이팬에서 9~12개 정도면 충분할 것 같습니다.	" },
+{ text: "	W: I think so, too. 	", audioSrc: "	audio/go1_3mo_23/10-7.mp3	" }, { text: "	W: 저도 그렇게 생각합니다.	" },
+{ text: "	An 8­inch frying pan seems too small for me.	", audioSrc: "	audio/go1_3mo_23/10-8.mp3	" }, { text: "	8­인치 프라이팬은 저에게 너무 작아 보입니다.	" },
+{ text: "	M: What about the material? 	", audioSrc: "	audio/go1_3mo_23/10-9.mp3	" }, { text: "	M: 소재는 어떻습니까?	" },
+{ text: "	Stainless steel pans are good for fast cooking.	", audioSrc: "	audio/go1_3mo_23/10-10.mp3	" }, { text: "	스테인리스 팬은 빠른 조리에 좋습니다.	" },
+{ text: "	W: I know, but they are heavier. 	", audioSrc: "	audio/go1_3mo_23/10-11.mp3	" }, { text: "	W: 알아요, 하지만 무게가 더 많이 나가요.	" },
+{ text: "	I’ll buy an aluminum pan.	", audioSrc: "	audio/go1_3mo_23/10-12.mp3	" }, { text: "	알루미늄 팬을 구매하겠습니다.	" },
+{ text: "	M: Then you have two options left. 	", audioSrc: "	audio/go1_3mo_23/10-13.mp3	" }, { text: "	M: 그럼 두 가지 옵션이 남아있네요.	" },
+{ text: "	Do you need a lid?	", audioSrc: "	audio/go1_3mo_23/10-14.mp3	" }, { text: "	뚜껑이 필요하신가요?	" },
+{ text: "	W: Of course. 	", audioSrc: "	audio/go1_3mo_23/10-15.mp3	" }, { text: "	W: 그럼요.	" },
+{ text: "	A lid keeps the oil from splashing. 	", audioSrc: "	audio/go1_3mo_23/10-16.mp3	" }, { text: "	뚜껑은 기름이 튀는 것을 방지합니다.	" },
+{ text: "	I’ll buy this one.	", audioSrc: "	audio/go1_3mo_23/10-17.mp3	" }, { text: "	이거 하나 사겠습니다.	" },
+{ text: "	M: Good choice.	", audioSrc: "	audio/go1_3mo_23/10-18.mp3	" }, { text: "	M: 잘 골랐어요.	" },
+
+                ],
+                sentenceButtonState: 0
+                            
+              },
+            {
+                question: "<p>11. 대화를 듣고, 남자의 마지막 말에 대한 여자의 응답으로 가장 적절한 것을 고르시오.</p>",
+          choices: ["① I don’t think I can finish editing it by then.", "② I learned it by myself through books.", "③ This short movie is very interesting.", "④ You should make another video clip.", "⑤ I got an A+  on the team project."],
+          correctAnswer: 2   ,
+          audioURL: audioURL,
+          playbackStart: "15:58.5",
+          playbackEnd: "16:27",
+                audiotext: [
+                    { text: "	M: Have you finished your team’s short­-movie project?	", audioSrc: "	audio/go1_3mo_23/11-1.mp3	" }, { text: "	M: 팀의 단편 ­ 영화 프로젝트는 완료하셨나요?	" },
+{ text: "	W: Not yet. 	", audioSrc: "	audio/go1_3mo_23/11-2.mp3	" }, { text: "	W: 아직은 아닙니다.	" },
+{ text: "	I’m still editing the video clip.	", audioSrc: "	audio/go1_3mo_23/11-3.mp3	" }, { text: "	아직 동영상 편집 중입니다.	" },
+{ text: "	M: Oh, you edit? 	", audioSrc: "	audio/go1_3mo_23/11-4.mp3	" }, { text: "	M: 아, 편집을 해주시나요?	" },
+{ text: "	How did you learn to do that?	", audioSrc: "	audio/go1_3mo_23/11-5.mp3	" }, { text: "	어떻게 그걸 배웠습니까?	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              },
+            {
+                 question: "<p>12. 대화를 듣고, 여자의 마지막 말에 대한 남자의 응답으로 가장 적절한 것을 고르시오.</p>",
+          choices: ["① All right. I’ll come pick you up now.", "② I’m sorry. The library is closed today.", "③ No problem. You can borrow my book.", "④ Thank you so much. I’ll drop you off now.", "⑤ Right. I’ve changed the interior of my office."],
+          correctAnswer: 1   ,
+          audioURL: audioURL,
+          playbackStart: "16:36.6",
+          playbackEnd: "17:09.6",
+                audiotext: [
+                    { text: "	W: Daddy, are you still working now?	", audioSrc: "	audio/go1_3mo_23/12-1.mp3	" }, { text: "	W: 아버지, 지금도 일하고 계세요?	" },
+{ text: "	M: No, Emma. 	", audioSrc: "	audio/go1_3mo_23/12-2.mp3	" }, { text: "	M: 아니, 엠마.	" },
+{ text: "	I’m about to get in my car and drive home.	", audioSrc: "	audio/go1_3mo_23/12-3.mp3	" }, { text: "	차를 타고 집에 가려고 합니다.	" },
+{ text: "	W: Great. Can you give me a ride? 	", audioSrc: "	audio/go1_3mo_23/12-4.mp3	" }, { text: "	W: 좋습니다. 태워다 주실 수 있나요?	" },
+{ text: "	I’m at the City Library near your office.	", audioSrc: "	audio/go1_3mo_23/12-5.mp3	" }, { text: "	저는 당신의 사무실 근처에 있는 시립 도서관에 있습니다.	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              
+              
+              },
+            {
+                 question: "<p>13. 대화를 듣고, 남자의 마지막 말에 대한 여자의 응답으로 가장 적절한 것을 고르시오.<br>Woman:_______________________________</p>",
+          choices: ["① Try these tomatoes and cucumbers.", "② I didn’t know peppers are good for skin.", "③ Just wear comfortable clothes and shoes.", "④ You can pick tomatoes when they are red.", "⑤ I’ll help you grow vegetables on your farm."],
+          correctAnswer: 3   ,
+          audioURL: audioURL,
+          playbackStart: "17:19.5",
+          playbackEnd: "17:33",
+                audiotext: [
+                    { text: "	M: Claire, how’s your farm doing?	", audioSrc: "	audio/go1_3mo_23/13-1.mp3	" }, { text: "	M: 클레어, 너희 농장은 어때요?	" },
+{ text: "	W: Great! I harvested some cherry tomatoes and cucumbers last weekend. 	", audioSrc: "	audio/go1_3mo_23/13-2.mp3	" }, { text: "	W: 잘됐네요! 저는 지난 주말에 방울토마토와 오이를 수확했어요.	" },
+{ text: "	Do you want some?	", audioSrc: "	audio/go1_3mo_23/13-3.mp3	" }, { text: "	좀 드릴까요?	" },
+{ text: "	M: Of course. I’d like some very much.	", audioSrc: "	audio/go1_3mo_23/13-4.mp3	" }, { text: "	M: 물론이죠. 아주 조금 주세요.	" },
+{ text: "	W: Okay. 	", audioSrc: "	audio/go1_3mo_23/13-5.mp3	" }, { text: "	W: 네.	" },
+{ text: "	I’ll bring you some tomorrow.	", audioSrc: "	audio/go1_3mo_23/13-6.mp3	" }, { text: "	내일 가져다드리겠습니다.	" },
+{ text: "	M: Thanks. 	", audioSrc: "	audio/go1_3mo_23/13-7.mp3	" }, { text: "	M: 감사합니다.	" },
+{ text: "	Are you going to the farm this weekend too?	", audioSrc: "	audio/go1_3mo_23/13-8.mp3	" }, { text: "	이번 주말에도 농장에 가시나요?	" },
+{ text: "	W: Yes. The peppers are almost ready to be picked.	", audioSrc: "	audio/go1_3mo_23/13-9.mp3	" }, { text: "	W: 네. 고추를 따기 위한 준비가 거의 다 되었습니다.	" },
+{ text: "	M: Can I go with you? 	", audioSrc: "	audio/go1_3mo_23/13-10.mp3	" }, { text: "	M: 같이 가도 될까요?	" },
+{ text: "	I’d like to look around your farm and help you pick the peppers.	", audioSrc: "	audio/go1_3mo_23/13-11.mp3	" }, { text: "	귀하의 농장을 둘러보고 고추 따는 것을 돕고 싶습니다.	" },
+{ text: "	W: Sure. It would be fun to work on the farm together.	", audioSrc: "	audio/go1_3mo_23/13-12.mp3	" }, { text: "	W: 물론이죠. 농장에서 같이 일하면 재미있을 것 같아요.	" },
+{ text: "	M: Sounds nice. 	", audioSrc: "	audio/go1_3mo_23/13-13.mp3	" }, { text: "	M: 좋습니다.	" },
+{ text: "	Is there anything I need to prepare?	", audioSrc: "	audio/go1_3mo_23/13-14.mp3	" }, { text: "	제가 준비해야 할 것이 있나요?	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              
+              
+              },
+            {
+                 question: "<p>14. 대화를 듣고, 여자의 마지막 말에 대한 남자의 응답으로 가장 적절한 것을 고르시오. [3점]<br>Man:_______________________________</p>",
+          choices: ["① You’re right. I’ll meet her and apologize.", "② I agree with you. That’s why I did it.", "③ Thank you. I appreciate your apology.", "④ Don’t worry. I don’t think it’s your fault.", "⑤ Too bad. I hope the two of you get along."],
+          correctAnswer: 1   ,
+          audioURL: audioURL,
+          playbackStart: "18:32",
+          playbackEnd: "19:38.5",
+                audiotext: [
+                    { text: "	W: Daniel, what’s wrong?	", audioSrc: "	audio/go1_3mo_23/14-1.mp3	" }, { text: "	W: 다니엘, 무슨 일 있어요?	" },
+{ text: "	M: Hi, Leila. I had an argument with Olivia.	", audioSrc: "	audio/go1_3mo_23/14-2.mp3	" }, { text: "	M: 안녕하세요, 레일라. 올리비아와 말다툼을 했어요.	" },
+{ text: "	W: Was it serious?	", audioSrc: "	audio/go1_3mo_23/14-3.mp3	" }, { text: "	W: 심각했나요?	" },
+{ text: "	M: I’m not sure, 	", audioSrc: "	audio/go1_3mo_23/14-4.mp3	" }, { text: "	M: 잘 모르겠는데요,	" },
+{ text: "	but I think I made a mistake.	", audioSrc: "	audio/go1_3mo_23/14-5.mp3	" }, { text: "	그런데 제가 실수를 한 것 같습니다.	" },
+{ text: "	W: So that’s why you have a long face.	", audioSrc: "	audio/go1_3mo_23/14-6.mp3	" }, { text: "	W: 그래서 얼굴이 긴 거네요.	" },
+{ text: "	M: Yeah. I want to get along with her, 	", audioSrc: "	audio/go1_3mo_23/14-7.mp3	" }, { text: "	M: 네, 저는 그녀와 잘 지내고 싶습니다,	" },
+{ text: "	but she’s still angry at me.	", audioSrc: "	audio/go1_3mo_23/14-8.mp3	" }, { text: "	하지만 그녀는 여전히 저에게 화가 나있어요.	" },
+{ text: "	W: Did you say you’re sorry to her?	", audioSrc: "	audio/go1_3mo_23/14-9.mp3	" }, { text: "	W: 그 여자한테 미안하다고 했나요?	" },
+{ text: "	M: Well, I texted her saying that I’m sorry.	", audioSrc: "	audio/go1_3mo_23/14-10.mp3	" }, { text: "	M: 미안하다고 문자를 보냈어요.	" },
+{ text: "	W: I don’t think it’s a good idea to express your apology through a text message.	", audioSrc: "	audio/go1_3mo_23/14-11.mp3	" }, { text: "	W: 죄송하다는 말씀을 문자로 전달하는 것은 좋지 않은 것 같습니다.	" },
+{ text: "	M: Do you think so? 	", audioSrc: "	audio/go1_3mo_23/14-12.mp3	" }, { text: "	M: 그렇게 생각하시나요?	" },
+{ text: "	Now I know why I haven’t received any response from her yet.	", audioSrc: "	audio/go1_3mo_23/14-13.mp3	" }, { text: "	이제 저는 제가 왜 아직 그녀에게서 아무런 응답을 받지 못했는지 압니다.	" },
+{ text: "	W: I think it’d be best to go and talk to her in person.	", audioSrc: "	audio/go1_3mo_23/14-14.mp3	" }, { text: "	W: 직접 가서 말씀드리는 것이 가장 좋을 것 같습니다.	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              
+              
+              },
+            {
+                 question: "<p>15. 다음 상황 설명을 듣고, John이 Ted에게 할 말로 가장 적절한 것을 고르시오. [3점]<br>John:_______________________________</p>",
+          choices: ["① How can we find the best sunrise spot?", "② Why do you go mountain climbing so often?", "③ What time should we get up tomorrow morning?", "④ When should we come down from the mountain top?", "⑤ Where do we have to stay in the mountain at night?"],
+          correctAnswer: 3   ,
+          audioURL: audioURL,
+          playbackStart: "19:47",
+          playbackEnd: "20:50",
+                audiotext: [
+                    { text: "	Ted and John are college freshmen. 	", audioSrc: "	audio/go1_3mo_23/15-1.mp3	" }, { text: "	테드와 존은 대학 신입생입니다.	" },
+{ text: "	They are climbing Green Diamond Mountain together. 	", audioSrc: "	audio/go1_3mo_23/15-2.mp3	" }, { text: "	그들은 함께 그린 다이아몬드 산을 오르고 있습니다.	" },
+{ text: "	Now they have reached the campsite near the mountain top. 	", audioSrc: "	audio/go1_3mo_23/15-3.mp3	" }, { text: "	이제 그들은 산 정상 근처의 캠핑장에 도착했습니다.	" },
+{ text: "	After climbing the mountain all day, 	", audioSrc: "	audio/go1_3mo_23/15-4.mp3	" }, { text: "	하루 종일 산을 오른 후에,	" },
+{ text: "	they have a relaxing time at the campsite. 	", audioSrc: "	audio/go1_3mo_23/15-5.mp3	" }, { text: "	그들은 캠프장에서 편안한 시간을 보냅니다.	" },
+{ text: "	While drinking coffee, 	", audioSrc: "	audio/go1_3mo_23/15-6.mp3	" }, { text: "	커피 마시면서,	" },
+{ text: "	Ted suggests to John that they watch the sunrise at the mountain top	", audioSrc: "	audio/go1_3mo_23/15-7.mp3	" }, { text: "	테드는 존에게 그들이 산꼭대기에서 일출을 볼 것을 제안합니다	" },
+{ text: "	the next morning. 	", audioSrc: "	audio/go1_3mo_23/15-8.mp3	" }, { text: "	다음날 아침.	" },
+{ text: "	John thinks it’s a good idea. So, 	", audioSrc: "	audio/go1_3mo_23/15-9.mp3	" }, { text: "	존은 그게 좋은 생각이라고 생각해요 그래서,	" },
+{ text: "	now John wants to ask Ted how early they should wake up to see the sunrise. 	", audioSrc: "	audio/go1_3mo_23/15-10.mp3	" }, { text: "	이제 존은 테드에게 일출을 보기 위해 얼마나 일찍 일어나야 하는지 묻고 싶어합니다.	" },
+{ text: "	In this situation, 	", audioSrc: "	audio/go1_3mo_23/15-11.mp3	" }, { text: "	이런 상황에서,	" },
+{ text: "	what would John most likely say to Ted?	", audioSrc: "	audio/go1_3mo_23/15-12.mp3	" }, { text: "	존은 테드에게 뭐라고 말할 것 같습니까?	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              
+              
+              },
+            {
+                 question: "<p>[16 ~ 17] 다음을 듣고, 물음에 답하시오.<br><br>16. 여자가 하는 말의 주제로 가장 적절한 것은?</p>",
+          choices: ["① indoor sports good for the elderly", "② importance of learning rules in sports", "③ best sports for families to enjoy together", "④ useful tips for winning a sports game", "⑤ history of traditional family sports"],
+          correctAnswer: 3   ,
+          audioURL: audioURL,
+          playbackStart: "20:59",
+          playbackEnd: "23:22",
+                audiotext: [
+                    { text: "	Good morning, everyone. 	", audioSrc: "	audio/go1_3mo_23/16-1.mp3	" }, { text: "	여러분 좋은 아침이에요.	" },
+{ text: "	Do you spend a lot of time with your family? 	", audioSrc: "	audio/go1_3mo_23/16-2.mp3	" }, { text: "	가족과 많은 시간을 보내시나요?	" },
+{ text: "	One of the best ways to spend time with your family is to enjoy sports together.	", audioSrc: "	audio/go1_3mo_23/16-3.mp3	" }, { text: "	가족과 함께 시간을 보내는 가장 좋은 방법 중 하나는 스포츠를 함께 즐기는 것입니다.	" },
+{ text: "	Today, I will share some of the best sports	", audioSrc: "	audio/go1_3mo_23/16-4.mp3	" }, { text: "	오늘은 최고의 스포츠를 공유하겠습니다	" },
+{ text: "	that families can play together. 	", audioSrc: "	audio/go1_3mo_23/16-5.mp3	" }, { text: "	가족들이 함께 놀 수 있다는 것을.	" },
+{ text: "	The first one is badminton. The	", audioSrc: "	audio/go1_3mo_23/16-6.mp3	" }, { text: "	첫번째는 배드민턴입니다. 그	" },
+{ text: "	whole family can enjoy the sport with minimal equipment. 	", audioSrc: "	audio/go1_3mo_23/16-7.mp3	" }, { text: "	온 가족이 최소한의 장비로 스포츠를 즐길 수 있습니다.	" },
+{ text: "	The second one is basketball. 	", audioSrc: "	audio/go1_3mo_23/16-8.mp3	" }, { text: "	두 번째는 농구입니다.	" },
+{ text: "	You can easily find a basketball court near your house. 	", audioSrc: "	audio/go1_3mo_23/16-9.mp3	" }, { text: "	집 근처에 농구장을 쉽게 찾을 수 있습니다.	" },
+{ text: "	The third one is table tennis. 	", audioSrc: "	audio/go1_3mo_23/16-10.mp3	" }, { text: "	세 번째는 탁구입니다.	" },
+{ text: "	It can be played indoors anytime. 	", audioSrc: "	audio/go1_3mo_23/16-11.mp3	" }, { text: "	언제든지 실내에서 연주할 수 있습니다.	" },
+{ text: "	The last one is bowling. 	", audioSrc: "	audio/go1_3mo_23/16-12.mp3	" }, { text: "	마지막은 볼링입니다.	" },
+{ text: "	Many families have a great time playing it together. 	", audioSrc: "	audio/go1_3mo_23/16-13.mp3	" }, { text: "	많은 가족들이 함께 연주하며 즐거운 시간을 보냅니다.	" },
+{ text: "	When you go home today, 	", audioSrc: "	audio/go1_3mo_23/16-14.mp3	" }, { text: "	오늘 집에 가면,	" },
+{ text: "	how about playing one of these sports with your family?	", audioSrc: "	audio/go1_3mo_23/16-15.mp3	" }, { text: "	가족들과 함께 이 운동들중 하나를 하는게 어때요?	" },
+
+                ],
+                sentenceButtonState: 0
+              
+              
+              
+              },
+            {
+                 question: "<p>17. 언급된 스포츠가 아닌 것은?</p>",
+          choices: ["① badminton", "② basketball", "③ table tennis", "④ soccer", "⑤ bowling"],
+          correctAnswer: 4   ,
+          audioURL: audioURL,
+          playbackStart: "21:30",
+          playbackEnd: "21:41",
+                audiotext: [
+                    { text: "16번 문장과 같습니다." },{ text: "16번 해석과 같습니다." },
+                ],
+                sentenceButtonState: 0
+            },
+        ];
+        let currentAudio = null;
+        let currentPlaybackButton = null;
+
+        function createQuizElements() {
+            const quizContainer = document.createElement('div');
+            quizzes.forEach((quiz, index) => {
+                const quizElement = document.createElement('div');
+                quizElement.innerHTML = `<p><strong>${quiz.question}</strong></p>`;
+                quiz.choices.forEach((choice, choiceIndex) => {
+                    const choiceElement = document.createElement('div');
+                    choiceElement.innerHTML = `
+                        <input type="radio" id="quiz${index}_choice${choiceIndex}" name="quiz${index}_choices" value="${choice}">
+                        <label id="quiz${index}_choice${choiceIndex}_label" for="quiz${index}_choice${choiceIndex}">${choice}</label>
+                    `;
+                    choiceElement.addEventListener('click', function () {
+                        clearOtherCheckboxes(index, choiceIndex);
+                    });
+                    quizElement.appendChild(choiceElement);
+                });
+                const playbackButton = document.createElement('button');
+                playbackButton.textContent = "재생";
+                playbackButton.onclick = function () {
+                    if (currentPlaybackButton === playbackButton && currentAudio && !currentAudio.paused) {
+                        pauseAudio();
+                        currentPlaybackButton.textContent = "재생";
+                    } else {
+                        playAudio(quiz.playbackStart, quiz.playbackEnd, quiz.audioURL, playbackButton);
+                        if (currentPlaybackButton) {
+                            currentPlaybackButton.textContent = "멈춤";
+                        }
+                        currentPlaybackButton = playbackButton;
+                    }
+                };
+                quizElement.appendChild(playbackButton);
+                const answerButton = document.createElement('button');
+                answerButton.textContent = "정답 보기";
+                answerButton.onclick = function () {
+                    const correctAnswer = quiz.correctAnswer - 1;
+                    const selectedChoice = document.querySelector(`input[name="quiz${index}_choices"]:checked`);
+                    if (selectedChoice) {
+                        const choiceIndex = parseInt(selectedChoice.id.split('_')[1].replace('choice', ''));
+                        const choiceLabel = document.getElementById(`quiz${index}_choice${choiceIndex}_label`);
+                        if (choiceIndex === correctAnswer) {
+                            choiceLabel.style.color = "blue";
+                        } else {
+                            const correctLabel = document.getElementById(`quiz${index}_choice${correctAnswer}_label`);
+                            correctLabel.style.color = "red";
+                        }
+                    } else {
+                        const correctLabel = document.getElementById(`quiz${index}_choice${correctAnswer}_label`);
+                        correctLabel.style.color = "red";
+                    }
+
+                    if (answerButton.textContent === "정답 보기") {
+                        answerButton.textContent = "정답 닫기";
+                    } else {
+                        const labels = quizElement.querySelectorAll('label');
+                        labels.forEach(label => {
+                            label.style.color = "";
+                        });
+                        answerButton.textContent = "정답 보기";
+                    }
+                };
+                quizElement.appendChild(answerButton);
+
+                const sentenceButton = document.createElement('button');
+                sentenceButton.textContent = "문장 보기";
+                sentenceButton.onclick = function () {
+                    let sentenceDisplay = quizElement.querySelector('.sentence-display');
+                    if (!sentenceDisplay) {
+                        sentenceDisplay = document.createElement('div');
+                        sentenceDisplay.classList.add('sentence-display');
+                        quizElement.appendChild(sentenceDisplay);
+                    }
+                    const sentences = quiz.audiotext.map(item => item.text);
+                    const audioSrcs = quiz.audiotext.map(item => item.audioSrc);
+                    if (quiz.sentenceButtonState === 0) {
+                        sentenceDisplay.innerHTML = '';
+                        sentences.forEach((sentence, i) => {
+                            if (i % 2 === 0) {
+                                const p = document.createElement('p');
+                                p.textContent = sentence;
+                                p.addEventListener('click', function () {
+                                    playAudio(null, null, audioSrcs[i], null);
+                                });
+                                sentenceDisplay.appendChild(p);
+                            }
+                        });
+                        sentenceButton.textContent = "해석 보기";
+                        quiz.sentenceButtonState = 1;
+                    } else if (quiz.sentenceButtonState === 1) {
+                        sentenceDisplay.innerHTML = '';
+                        sentences.forEach((sentence, i) => {
+                            const p = document.createElement('p');
+                            p.textContent = sentence;
+                            p.addEventListener('click', function () {
+                                playAudio(null, null, audioSrcs[i], null);
+                            });
+                            if (i % 2 === 1) {
+                                p.style.color = "#999";
+                            }
+                            sentenceDisplay.appendChild(p);
+                        });
+                        sentenceButton.textContent = "문장 닫기";
+                        quiz.sentenceButtonState = 2;
+                    } else {
+                        sentenceDisplay.innerHTML = '';
+                        sentenceButton.textContent = "문장 보기";
+                        quiz.sentenceButtonState = 0;
+                    }
+                };
+                quizElement.appendChild(sentenceButton);
+                quizContainer.appendChild(quizElement);
+            });
+            document.body.appendChild(quizContainer);
+        }
+
+        function playAudio(startTime, endTime, audioURL, button) {
+            if (currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+                if (currentPlaybackButton) {
+                    currentPlaybackButton.textContent = "재생";
+                }
+            }
+            currentAudio = new Audio(audioURL);
+            if (startTime && endTime) {
+                const startSeconds = convertTimeToSeconds(startTime);
+                const endSeconds = convertTimeToSeconds(endTime);
+                currentAudio.currentTime = startSeconds;
+                currentAudio.play();
+                if (button) {
+                    button.textContent = "멈춤";
+                    currentPlaybackButton = button;
+                    currentAudio.onended = function () {
+                        button.textContent = "재생";
+                    };
+                    setTimeout(function () {
+                        currentAudio.pause();
+                        button.textContent = "재생";
+                    }, (endSeconds - startSeconds) * 1000);
+                }
+            } else {
+                currentAudio.play();
+            }
+        }
+
+        function convertTimeToSeconds(time) {
+            const [minutes, seconds] = time.split(':').map(part => parseInt(part));
+            return minutes * 60 + seconds;
+        }
+
+        function pauseAudio() {
+            console.log("pauseAudio 함수가 호출되었습니다.");
+            if (currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+            }
+        }
+
+        function clearOtherCheckboxes(index, checkedIndex) {
+            const checkboxes = document.querySelectorAll(`input[name="quiz${index}_choices"]`);
+            checkboxes.forEach((checkbox, choiceIndex) => {
+                if (choiceIndex !== checkedIndex) {
+                    checkbox.checked = false;
+                }
+            });
+        }
+
+       window.onload = function () {
+    createQuizElements();
+
+    const examButton = document.getElementById('examButton');
+    const closeExamButton = document.getElementById('closeExamButton');
+    examButton.addEventListener('click', function () {
+        const labels = document.querySelectorAll('label');
+        labels.forEach(label => {
+            label.style.color = "";
+        });
+        const checkboxes = document.querySelectorAll('input[type="radio"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+            if (currentPlaybackButton) {
+                currentPlaybackButton.textContent = "재생";
+            }
+        }
+        document.getElementById('audioPlayer').style.display = 'block';
+        const sentenceDisplays = document.querySelectorAll('.sentence-display');
+        sentenceDisplays.forEach(sentenceDisplay => {
+            sentenceDisplay.style.display = 'none';
+        });
+        examButton.style.display = 'none';
+        closeExamButton.style.display = 'inline-block';
+        const buttons = document.querySelectorAll('button:not(#closeExamButton)');
+        buttons.forEach(button => {
+            button.style.display = 'none';
+        });
+        const checkAnswersButton = document.createElement('button');
+        checkAnswersButton.textContent = "채점하기";
+        checkAnswersButton.id = "checkAnswersButton";
+        checkAnswersButton.onclick = function () {
+    // 채점하기 버튼 클릭 시, 오디오 플레이어가 재생 중인 경우 중지
+    if (!document.getElementById('audioPlayer').paused) {
+        document.getElementById('audioPlayer').pause();
+    }
+
+    let correctCount = 0;
+    let incorrectNumbers = [];
+    quizzes.forEach((quiz, index) => {
+        const correctAnswer = quiz.correctAnswer - 1;
+        const selectedChoice = document.querySelector(`input[name="quiz${index}_choices"]:checked`);
+        const choiceLabels = document.querySelectorAll(`label[for^="quiz${index}_choice"]`);
+        if (selectedChoice) {
+            const choiceIndex = parseInt(selectedChoice.id.split('_')[1].replace('choice', ''));
+            if (choiceIndex === correctAnswer) {
+                correctCount++;
+                choiceLabels[choiceIndex].style.color = "blue";
+            } else {
+                incorrectNumbers.push(index + 1);
+                choiceLabels[correctAnswer].style.color = "red";
+            }
+        } else {
+            incorrectNumbers.push(index + 1);
+            choiceLabels[correctAnswer].style.color = "red";
+        }
+    });
+    const totalQuestions = quizzes.length;
+    const correctAnswers = correctCount;
+    const incorrectAnswers = incorrectNumbers.length;
+    let resultMessage = `<h3>총 ${totalQuestions} 문항 중 ${correctAnswers}개 맞췄습니다.</h3>.`;
+    if (incorrectAnswers > 0) {
+        resultMessage += `<br><br>오답 번호:<br> ${incorrectNumbers.join('번, ')}번`;
+    }else {
+                resultMessage = "<h2>와우~! 만점입니다~!<br><br>알빠노~<br><<h2>";
+            }
+
+    const backgroundOverlay = document.createElement('div');
+    backgroundOverlay.classList.add('background-overlay');
+    document.body.appendChild(backgroundOverlay);
+
+    const popupOverlay = document.createElement('div');
+    popupOverlay.classList.add('popup-overlay');
+    document.body.appendChild(popupOverlay);
+
+    const popupBox = document.createElement('div');
+    popupBox.classList.add('popup-box');
+    popupBox.innerHTML = `
+        <p>${resultMessage}</p>
+        <button id="confirmButton">확인</button>
+    `;
+    document.body.appendChild(popupBox);
+
+    const confirmButton = document.getElementById('confirmButton');
+    confirmButton.addEventListener('click', function () {
+        const backgroundOverlay = document.querySelector('.background-overlay');
+        backgroundOverlay.parentNode.removeChild(backgroundOverlay);
+
+        const popupOverlay = document.querySelector('.popup-overlay');
+        popupOverlay.parentNode.removeChild(popupOverlay);
+
+        const popupBox = document.querySelector('.popup-box');
+        popupBox.parentNode.removeChild(popupBox);
+    });
+};
+
+
+
+        document.body.appendChild(checkAnswersButton);
+    });
+    closeExamButton.addEventListener('click', function () {
+        console.log("closeExamButton 클릭 이벤트가 발생했습니다.");
+        // 오디오 중지
+       document.getElementById('audioSource').src = '';
+        // 오디오 소스 비움
+        document.getElementById('audioSource').src = '';
+        if (currentPlaybackButton) {
+            currentPlaybackButton.textContent = "재생";
+        }
+        document.getElementById('audioPlayer').pause(); // 오디오 플레이어를 직접 멈춤
+        document.getElementById('audioPlayer').currentTime = 0; // 오디오 재생 위치를 초기화
+        document.getElementById('audioPlayer').style.display = 'none';
+        const quizContainer = document.querySelector('div');
+        quizContainer.parentNode.removeChild(quizContainer);
+        createQuizElements();
+        examButton.style.display = 'inline-block';
+        closeExamButton.style.display = 'none';
+        const buttons = document.querySelectorAll('button:not(#closeExamButton)');
+        buttons.forEach(button => {
+            button.style.display = 'inline-block';
+        });
+        const checkAnswersButton = document.getElementById('checkAnswersButton');
+        if (checkAnswersButton) {
+            checkAnswersButton.parentNode.removeChild(checkAnswersButton);
+        }
+    });
+};
+
+
+    </script>
+</body>
+</html>
